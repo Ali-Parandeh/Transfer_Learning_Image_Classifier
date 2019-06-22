@@ -12,15 +12,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import json
-import argparse
 import torch
-from torch import nn, optim
-import torch.nn.functional as F
 from torchvision import datasets, transforms, models
+from args import get_prediction_input_args, get_training_input_args
 
+train_user_input = get_training_input_args()
+predict_user_input = get_prediction_input_args()
 
 # Baskets full of flowers for my valentines day
-data_dir = 'flowers'
+data_dir = train_user_input.dir
 train_dir = data_dir + '/train'
 valid_dir = data_dir + '/valid'
 test_dir = data_dir + '/test'
@@ -60,5 +60,6 @@ def data_loader(data_dir, train_dir, valid_dir, test_dir):
 
 data, data_loader =  data_loader(data_dir, train_dir, valid_dir, test_dir)
 
+def load_json()
 with open('cat_to_name.json', 'r') as f:
     cat_to_name = json.load(f)
