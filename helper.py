@@ -1,0 +1,64 @@
+# PROGRAMMER: Alireza Parandeh
+# DATE CREATED: 22.06.2019                            
+# REVISED DATE: 
+# PURPOSE: Create utility functions for loading data and preprocessing images.
+
+
+# Magic Commands
+%matplotlib inline
+%config inlineBackend.figure_format = 'retina'
+
+# Import here
+import matplotlib.pyplot as plt
+import numpy as np
+import json
+import argparse
+import torch
+from torch import nn, optim
+import torch.nn.functional as F
+from torchvision import datasets, transforms, models
+
+
+# Baskets full of flowers for my valentines day
+data_dir = 'flowers'
+train_dir = data_dir + '/train'
+valid_dir = data_dir + '/valid'
+test_dir = data_dir + '/test'
+
+# TODO: Define your transforms for the training, validation, and testing sets
+def data_loader(data_dir, train_dir, valid_dir, test_dir):
+    # I'm just going to put my hands in the training flower basket and shuffle, cut and skew my flowers
+    train_transforms = transforms.Compose([transforms.RandomRotation(30), 
+                                          transforms.RandomResizedCrop(224),
+                                          transforms.RandomHorizontalFlip(),
+                                          transforms.ToTensor(),
+                                          transforms.Normalize([0.485, 0.456, 0.406],
+                                                               [0.229, 0.224, 0.225])])
+
+    test_valid_transforms = transforms.Compose([transforms.Resize(255),
+                                         transforms.CenterCrop(224),
+                                         transforms.ToTensor(),
+                                         transforms.Normalize([0.485, 0.456, 0.406],
+                                                              [0.229, 0.224, 0.225])])
+
+    
+    # TODO: Load the datasets with ImageFolder
+    data = {}
+    data["train_data"] = datasets.ImageFolder(train_dir, transform= train_transforms)
+    data["test_data"] = datasets.ImageFolder(test_dir, transform= test_valid_transforms)
+    data["valid_data"] = datasets.ImageFolder(valid_dir, transform= test_valid_transforms)
+
+    # TODO: Using the image datasets and the trainforms, define the dataloaders
+    data_loader = {}
+    data_loader["train_loader"] = torch.utils.data.DataLoader(data["train_data"], 
+                                                              batch_size=64, shuffle=True)
+    data_loader["test_loader"]  = torch.utils.data.DataLoader(data["test_data"], 
+                                                              batch_size=64, shuffle=True)
+    data_loader["valid_loader"]  = torch.utils.data.DataLoader(data["valid_data"], 
+                                                               batch_size=64, shuffle=True)
+    return data, data_loader
+
+data, data_loader =  data_loader(data_dir, train_dir, valid_dir, test_dir)
+
+with open('cat_to_name.json', 'r') as f:
+    cat_to_name = json.load(f)
