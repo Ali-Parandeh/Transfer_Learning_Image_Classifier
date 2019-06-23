@@ -41,6 +41,7 @@ def get_training_input_args():
       5. Hyperparameter --epochs with default value 10
       6. Hyperparameter --dropout with default value of 0.2
       7. Device --gpu with default value of 'cpu'
+      8. Save Directory --save_dir to specify where the checkpoint should be saved to.
     This function returns these arguments as an ArgumentParser object.
     Parameters:
      None - simply using argparse module to create & store command line arguments
@@ -56,6 +57,8 @@ def get_training_input_args():
     parser.add_argument("--epochs", type=int, default= 5, help="Number of epochs for training")
     parser.add_argument("--dropout", type=float, default= 0.2, help="Probability of unit dropout")
     parser.add_argument("--gpu",  action='store_true', help="Select to run the programme with GPU")
+    parser.add_argument("--save_dir",  type=str,
+                        help="Specify the folder path to save the trained model checkpoint to")
 
     return parser.parse_args()
 
