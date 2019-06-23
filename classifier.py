@@ -11,6 +11,8 @@ import torch.nn.functional as F
 
 
 training_user_input = get_training_input_args()
+learning_rate = training_user_input.learning_rate
+gpu = training_user_input.gpu
 
 # TODO: Build your network
 # Defining classifier architecture to replace the Densenet classifier
@@ -47,7 +49,7 @@ class Classifier(nn.Module):
 
 
 class Arguments():
-    def __init__(slef, device, criterion, optimizer):
-        self.device = torch.device("cuda:0" if training_user_input.gpu else "cpu")
+    def __init__(self, model, device, learning_rate):
+        self.device = torch.device("cuda:0" if device else "cpu")
         self.criterion = nn.NLLLoss()
-        self.optimizer = optim.Adam(model.classifier.parameters(), lr = training_user_input.learning_rate )
+        self.optimizer = optim.Adam(model.classifier.parameters(), lr = learning_rate )

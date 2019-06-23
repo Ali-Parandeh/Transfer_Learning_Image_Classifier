@@ -5,7 +5,7 @@
 #          That is, you'll pass in a single image /path/to/image and return the flower name and class probability.
 
 import args
-import helper
+from helper import load_labels
 
 
 def main():
