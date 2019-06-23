@@ -7,9 +7,47 @@
 import torch
 from torch import nn
 from torchvision import datasets, transforms, models
-from helper import data_loader, load_labels
 from classifier import Classifier, Arguments
 from args import get_training_input_args
+
+
+# Defining transforms for the training, validation, and testing sets
+def data_loader(data_dir):
+    # I'm just going to put my hands in the training flower basket and shuffle, cut and skew my flowers
+    train_dir = data_dir + '/train'
+    valid_dir = data_dir + '/valid'
+    test_dir = data_dir + '/test'
+    train_transforms = transforms.Compose([transforms.RandomRotation(30),
+                                           transforms.RandomResizedCrop(224),
+                                           transforms.RandomHorizontalFlip(),
+                                           transforms.ToTensor(),
+                                           transforms.Normalize([0.485, 0.456, 0.406],
+                                                                [0.229, 0.224, 0.225])])
+
+    test_valid_transforms = transforms.Compose([transforms.Resize(255),
+                                                transforms.CenterCrop(224),
+                                                transforms.ToTensor(),
+                                                transforms.Normalize([0.485, 0.456, 0.406],
+                                                                     [0.229, 0.224, 0.225])])
+
+    # Loading the datasets with ImageFolder
+    data = {}
+    data["train_data"] = datasets.ImageFolder(
+        train_dir, transform=train_transforms)
+    data["test_data"] = datasets.ImageFolder(
+        test_dir, transform=test_valid_transforms)
+    data["valid_data"] = datasets.ImageFolder(
+        valid_dir, transform=test_valid_transforms)
+
+    # Using the image datasets and the trainforms, define the dataloaders
+    data_iterator = {}
+    data_iterator["train_loader"] = torch.utils.data.DataLoader(data["train_data"],
+                                                                batch_size=64, shuffle=True)
+    data_iterator["test_loader"] = torch.utils.data.DataLoader(data["test_data"],
+                                                               batch_size=64, shuffle=True)
+    data_iterator["valid_loader"] = torch.utils.data.DataLoader(data["valid_data"],
+                                                                batch_size=64, shuffle=True)
+    return data, data_iterator
 
 
 # Trains the Network
@@ -128,11 +166,11 @@ def main():
     if ti.arch == "vgg16":
         model = models.vgg16(pretrained=True)
         input_features = model.classifier[0].in_features
-        checkpoint_name = "vgg16_checkpoint.tph"
+        checkpoint_name = "vgg16_checkpoint.pth"
     else:
         model = models.densenet121(pretrained=True)
         input_features = model.classifier.in_features
-        checkpoint_name = "densenet121_checkpoint.tph"
+        checkpoint_name = "densenet121_checkpoint.pth"
 
     for param in model.parameters():
         param.requires_grad = False

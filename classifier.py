@@ -5,17 +5,11 @@
 #          Also, Prints out training loss, validation loss, and validation accuracy as the network trains
     
 import torch
-from args import get_training_input_args
 from torch import nn, optim
 import torch.nn.functional as F
 
-
-training_user_input = get_training_input_args()
-learning_rate = training_user_input.learning_rate
-gpu = training_user_input.gpu
-
-# TODO: Build your network
-# Defining classifier architecture to replace the Densenet classifier
+# Building network
+# Defining classifier architecture to replace the pretrained CNN classifier
 
 class Classifier(nn.Module):
     def __init__(self, input_size, output_size, hidden_layer, drop_p=0.2):

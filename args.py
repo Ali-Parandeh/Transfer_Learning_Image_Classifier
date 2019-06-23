@@ -53,7 +53,7 @@ def get_training_input_args():
     parser.add_argument("--arch", type=str, choices=["vgg16", "densenet121"], default = "densenet121", help="Type of CNN model architecture to use")
     parser.add_argument("--learning_rate", type=float, default= 0.001, help="The learning rate of the CNN training")
     parser.add_argument("--hidden_units", type=int, default= 1000, help="Number of units in the hidden layer of the classifier")
-    parser.add_argument("--epochs", type=int, default= 10, help="Number of epochs for training")
+    parser.add_argument("--epochs", type=int, default= 5, help="Number of epochs for training")
     parser.add_argument("--dropout", type=float, default= 0.2, help="Probability of unit dropout")
     parser.add_argument("--gpu",  action='store_true', help="Select to run the programme with GPU")
 
@@ -83,10 +83,10 @@ def get_prediction_input_args():
   
     parser = argparse.ArgumentParser(description= "Process the command line arguments provide by the user")
     parser.add_argument("input", type=str, help="Path to the image file" )
-    parser.add_argument("checkpoint", type=str, default="checkpoint.pth", help="Path to the model checkkpoint file to load")
+    parser.add_argument("checkpoint", type=str, default="checkpoint.tph", help="Path to the model checkkpoint file to load")
     parser.add_argument("--top_k", type=int, default= 5, help="The learning rate of the CNN training")
-    parser.add_argument("--category_names", type=str, help="Number of units in the hidden layer of the classifier")
-    parser.add_argument("--arch", type=str, choices=["vgg16", "densenet121"], default="densenet121", help="Type of CNN model architecture to use")
+    parser.add_argument("--category_names", type=str, default='cat_to_name.json', help="Number of units in the hidden layer of the classifier")
+    parser.add_argument("--arch", type=str, choices=["vgg16", "densenet121"], help="Type of CNN model architecture to use")
     parser.add_argument("--gpu", action='store_true', help="Select to run the programme with GPU")
 
     return parser.parse_args()

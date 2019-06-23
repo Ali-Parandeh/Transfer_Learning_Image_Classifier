@@ -1,34 +1,35 @@
 # PROGRAMMER: Alireza Parandeh
-# DATE CREATED: 22.06.2019                            
-# REVISED DATE: 
-# PURPOSE: Predict flower name from an image along with the probability of that name. 
+# DATE CREATED: 22.06.2019
+# REVISED DATE:
+# PURPOSE: Predict flower name from an image along with the probability of that name.
 #          That is, you'll pass in a single image /path/to/image and return the flower name and class probability.
 
 from args import get_prediction_input_args
 import torch
+import json
 import numpy as np
 from PIL import Image
 from torchvision import models
 from classifier import Classifier
-from helper import load_labels
 
 
-# TODO: Write a function that loads a checkpoint and rebuilds the model
+
+# Writing a function that loads a checkpoint and rebuilds the model
 def checkpoint_loader(filepath, model_name):
     ''' Constructs the fully trained model from a saved checkpoint.
     '''
-    checkpoint = torch.load(filepath, map_location=lambda storage, loc: storage)
-    
-    if model_name == "vgg16":
+    checkpoint = torch.load(
+        filepath, map_location=lambda storage, loc: storage)
+
+    if model_name:
         model = checkpoint["model"]
     else:
-        model = models.densenet121(pretrained= True)
+        model = models.densenet121(pretrained=True)
         model.classifier = Classifier(checkpoint['input_size'],
-                                    checkpoint['output_size'],
-                                    checkpoint['hidden_layer'],
-                                    checkpoint['dropout'])
+                                      checkpoint['output_size'],
+                                      checkpoint['hidden_layer'],
+                                      checkpoint['dropout'])
 
-    
     model.load_state_dict(checkpoint['state_dict'])
     model.class_to_idx = checkpoint["class_to_idx"]
 
@@ -69,7 +70,12 @@ def process_image(image_path):
     return tensor_image
 
 
-def predict(image_path, model, topk=5):
+def load_labels(filepath):
+    with open(filepath, 'r') as f:
+        cat_to_name = json.load(f)
+        return cat_to_name
+
+def predict(image_path, model, gpu, json_path, topk=5):
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
 
@@ -81,6 +87,12 @@ def predict(image_path, model, topk=5):
 
     # Casting the inputs to torch.FloatTensor as they're the default tensor type for weights and biases
     image = image.float()
+
+    # Send the image tensor and the model to CPU or GPU for prediction depending user input and GPU availability
+    device = torch.device(
+        "cuda:0" if gpu and torch.cuda.is_available() else "cpu")
+    model.to(device)
+    image.to(device)
 
     # Feedforward the image through the model to get probabilities and classes
     model.eval()
@@ -97,23 +109,28 @@ def predict(image_path, model, topk=5):
     idx_to_classes = dict([[v, k] for k, v in model.class_to_idx.items()])
     classes = [idx_to_classes[idx] for idx in classes]
 
-    # Translate the flower class indices to class names and save in a list
-    cat_to_name = load_labels()
-    top_five_class_names = []
-
+    # Translate the image class indices to class names and save in a dictionary
+    cat_to_name = load_labels(json_path)
+    top_five_classes = []
     for i in range(len(classes)):
-        top_five_class_names.append(cat_to_name[classes[i]])
+        top_five_classes.append(cat_to_name[classes[i]])
 
-    return top_five_class_names, probs
+    return top_five_classes, probs
+
 
 def main():
     pi = get_prediction_input_args()
 
-    model = checkpoint_loader(pi.checkpoint, pi.model_name)
-    prediction, probs = predict(pi.input, model, pi.top_k)
-    
-    print(prediction, probs)
+    model = checkpoint_loader(pi.checkpoint, pi.arch)
+    prediction, probs = predict(
+        pi.input, model, pi.gpu, pi.category_names, pi.top_k)
 
+    print("The most likely class is {} with associated probability {}.".format(
+        prediction[0], probs[0]))
+    print("The other top {} classes include the following: ".format(pi.top_k - 1))
+    for i in range(len(prediction)-1):
+        print("Class Name: {}    Probability: {}". format(
+            prediction[i+1], probs[i+1]))
 
 
 if __name__ == "__main__":
