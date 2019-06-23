@@ -24,7 +24,6 @@
 
 
 import argparse
-import torch
 
 def get_training_input_args():
     """
@@ -50,8 +49,8 @@ def get_training_input_args():
     """
   
     parser = argparse.ArgumentParser(description= "Process the command line arguments provide by the user")
-    parser.add_argument("--dir", type=str, help="Path to the folder of flower images" )
-    parser.add_argument("--arch", type=str, default="densenet121", help="Type of CNN model architecture to use")
+    parser.add_argument("dir", type=str, help="Path to the folder of flower images" )
+    parser.add_argument("--arch", type=str, choices=["vgg16", "densenet121"], default = "densenet121", help="Type of CNN model architecture to use")
     parser.add_argument("--learning_rate", type=float, default= 0.001, help="The learning rate of the CNN training")
     parser.add_argument("--hidden_units", type=int, default= 1000, help="Number of units in the hidden layer of the classifier")
     parser.add_argument("--epochs", type=int, default= 10, help="Number of epochs for training")
@@ -84,19 +83,10 @@ def get_prediction_input_args():
     """
   
     parser = argparse.ArgumentParser(description= "Process the command line arguments provide by the user")
-    parser.add_argument("input", type=str, required= True, help="Path to the folder of flower images" )
-    parser.add_argument("checkpoint", type=str, required= True, help="Type of CNN model architecture to use")
-    parser.add_argument("--top_k", type=int, default= 3, help="The learning rate of the CNN training")
+    parser.add_argument("input", type=str, help="Path to the folder of flower images" )
+    parser.add_argument("checkpoint", type=str, help="Type of CNN model architecture to use")
+    parser.add_argument("--top_k", type=int, default= 5, help="The learning rate of the CNN training")
     parser.add_argument("--category_names", type=str, help="Number of units in the hidden layer of the classifier")
     parser.add_argument("--gpu", action='store_true', help="Select to run the programme with GPU")
 
     return parser.parse_args()
-
-
-def main():
-      x = get_training_input_args()
-      device = torch.device("cuda:0" if x.gpu else "cpu")
-      print(device)
-
-if __name__ == "__main__":
-    main()
