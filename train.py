@@ -1,7 +1,7 @@
 # PROGRAMMER: Alireza Parandeh
-# DATE CREATED: 22.06.2019                            
-# REVISED DATE: 
-# PURPOSE: Create functions to train a new network on a dataset and save the model as a checkpoint. 
+# DATE CREATED: 22.06.2019
+# REVISED DATE:
+# PURPOSE: Create functions to train a new network on a dataset and save the model as a checkpoint.
 #          Also, Prints out training loss, validation loss, and validation accuracy as the network trains
 
 import torch
@@ -92,7 +92,8 @@ def train(model, device, train_iterator, valid_iterator, criterion, optimizer, e
         else:
 
             with torch.no_grad():
-                validation_loss, validation_accuracy = validation(model, valid_iterator, criterion, device)
+                validation_loss, validation_accuracy = validation(
+                    model, valid_iterator, criterion, device)
                 training_losses.append(training_loss/len(train_iterator))
                 validation_losses.append(validation_loss/len(valid_iterator))
                 validation_accuracies.append(
@@ -154,7 +155,7 @@ def save_model(model, data, checkpoint_name, optimizer):
 
     torch.save(checkpoint, checkpoint_name)
 
-    return "Model Saved!"
+    print("Model Saved!")
 
 
 def main():
@@ -166,11 +167,11 @@ def main():
     if ti.arch == "vgg16":
         model = models.vgg16(pretrained=True)
         input_features = model.classifier[0].in_features
-        checkpoint_name = "vgg16_checkpoint.pth"
+        checkpoint_name = ti.save_dir + "vgg16_checkpoint.pth"
     else:
         model = models.densenet121(pretrained=True)
         input_features = model.classifier.in_features
-        checkpoint_name = "densenet121_checkpoint.pth"
+        checkpoint_name = ti.save_dir + "densenet121_checkpoint.pth"
 
     for param in model.parameters():
         param.requires_grad = False
@@ -178,18 +179,17 @@ def main():
     # Replacing the pre-trained model classifier with my own. The previous classifier parameters were frozen. Mine aren't so now if I train the network, only parameters of my classifier will be updated not the features layer.
     model.classifier = Classifier(input_features, 102, ti.hidden_units, drop_p=ti.dropout)
     hyperparams = Arguments(model, ti.gpu, ti.learning_rate, ti.epochs)
-
-    model.to(hyperparams.device)
+    model = model.to(hyperparams.device)
 
     model = train(
-        model, 
-        hyperparams.device, 
+        model,
+        hyperparams.device,
         data_iterator["train_loader"],
         data_iterator["train_loader"],
         hyperparams.criterion,
-        hyperparams.optimizer, 
+        hyperparams.optimizer,
         hyperparams.epochs)
-        
+
     save_model(model, data["train_data"],
                checkpoint_name, hyperparams.optimizer)
 
