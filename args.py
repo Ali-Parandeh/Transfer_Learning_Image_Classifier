@@ -77,7 +77,6 @@ def get_prediction_input_args():
       3. Top_k as --top_k int number to indicate top number of class predictions for the image file with default value of 5
       4. Category Names as --category_names String path to the category names json file.
       5. Device --gpu with default value of 'cpu'
-      6. 
     This function returns these arguments as an ArgumentParser object.
     Parameters:
      None - simply using argparse module to create & store command line arguments
