@@ -13,22 +13,21 @@ from torchvision import models
 from classifier import Classifier
 
 
-
 # Writing a function that loads a checkpoint and rebuilds the model
-def checkpoint_loader(filepath, model_name):
+def checkpoint_loader(filepath):
     ''' Constructs the fully trained model from a saved checkpoint.
     '''
     checkpoint = torch.load(
         filepath, map_location=lambda storage, loc: storage)
 
-    if model_name:
-        model = checkpoint["model"]
-    else:
+    if filepath == "checkpoint.tph":
         model = models.densenet121(pretrained=True)
         model.classifier = Classifier(checkpoint['input_size'],
                                       checkpoint['output_size'],
                                       checkpoint['hidden_layer'],
                                       checkpoint['dropout'])
+    else:
+        model = checkpoint["model"]
 
     model.load_state_dict(checkpoint['state_dict'])
     model.class_to_idx = checkpoint["class_to_idx"]
@@ -75,6 +74,7 @@ def load_labels(filepath):
         cat_to_name = json.load(f)
         return cat_to_name
 
+
 def predict(image_path, model, gpu, json_path, topk=5):
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
@@ -91,13 +91,17 @@ def predict(image_path, model, gpu, json_path, topk=5):
     # Send the image tensor and the model to CPU or GPU for prediction depending user input and GPU availability
     device = torch.device(
         "cuda:0" if gpu and torch.cuda.is_available() else "cpu")
-    model.to(device)
-    image.to(device)
+    print(device)
+    model = model.to(device)
+    image = image.to(device)
 
     # Feedforward the image through the model to get probabilities and classes
     model.eval()
     ps = torch.exp(model.forward(image))
     topk_probs, topk_classes = ps.topk(topk, dim=1)
+
+    # Moving tensors to CPU to be compatible for numpy array conversion
+    topk_probs, topk_classes = topk_probs.cpu(), topk_classes.cpu()
 
     # Converting tensors to standard python data structures
     probs = topk_probs.detach().numpy()[0]
@@ -121,7 +125,7 @@ def predict(image_path, model, gpu, json_path, topk=5):
 def main():
     pi = get_prediction_input_args()
 
-    model = checkpoint_loader(pi.checkpoint, pi.arch)
+    model = checkpoint_loader(pi.checkpoint)
     prediction, probs = predict(
         pi.input, model, pi.gpu, pi.category_names, pi.top_k)
 
