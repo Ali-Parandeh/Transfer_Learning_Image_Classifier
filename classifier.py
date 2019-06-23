@@ -49,7 +49,8 @@ class Classifier(nn.Module):
 
 
 class Arguments():
-    def __init__(self, model, device, learning_rate):
-        self.device = torch.device("cuda:0" if device else "cpu")
+    def __init__(self, model, device, learning_rate, epochs):
+        self.device = torch.device("cuda:0" if device and torch.cuda.is_available() else "cpu")
         self.criterion = nn.NLLLoss()
         self.optimizer = optim.Adam(model.classifier.parameters(), lr = learning_rate )
+        self.epochs = epochs

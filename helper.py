@@ -17,7 +17,6 @@ def data_loader(data_dir):
     train_dir = data_dir + '/train'
     valid_dir = data_dir + '/valid'
     test_dir = data_dir + '/test'
-
     train_transforms = transforms.Compose([transforms.RandomRotation(30), 
                                           transforms.RandomResizedCrop(224),
                                           transforms.RandomHorizontalFlip(),
@@ -39,14 +38,14 @@ def data_loader(data_dir):
     data["valid_data"] = datasets.ImageFolder(valid_dir, transform= test_valid_transforms)
 
     # TODO: Using the image datasets and the trainforms, define the dataloaders
-    data_loader = {}
-    data_loader["train_loader"] = torch.utils.data.DataLoader(data["train_data"], 
+    data_iterator = {}
+    data_iterator["train_loader"] = torch.utils.data.DataLoader(data["train_data"], 
                                                               batch_size=64, shuffle=True)
-    data_loader["test_loader"]  = torch.utils.data.DataLoader(data["test_data"], 
+    data_iterator["test_loader"]  = torch.utils.data.DataLoader(data["test_data"], 
                                                               batch_size=64, shuffle=True)
-    data_loader["valid_loader"]  = torch.utils.data.DataLoader(data["valid_data"], 
+    data_iterator["valid_loader"]  = torch.utils.data.DataLoader(data["valid_data"], 
                                                                batch_size=64, shuffle=True)
-    return data, data_loader
+    return data, data_iterator
 
 
 def load_labels():

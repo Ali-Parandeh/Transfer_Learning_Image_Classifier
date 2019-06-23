@@ -34,7 +34,7 @@ def get_training_input_args():
     values are used for the missing arguments. The following command line 
     arguments let the user specify the model training specification.
     Command Line Arguments:
-      1. Image Folder as --dir with default value '/flowers'
+      1. Image Folder as --dir with default value '/flowers' - Required Input
       2. CNN Model Architecture as --arch with default value 'vgg'
       3. Hyperparameter --learning_rate with default value 0.001
       4. Hyperparameter --hidden_units with default value 1000
@@ -69,12 +69,11 @@ def get_prediction_input_args():
     arguments let the user specify specifications for predictions.
     
     Command Line Arguments:
-      1. Image Folder as --dir with default value '/flowers'
-      2. CNN Model Architecture as --arch with default value 'vgg'
-      3. Hyperparameter --learning_rate with default value 0.001
-      4. Hyperparameter --hidden_units with default value 1000
-      5. Hyperparameter --epochs with default value 10
-      6. Device --gpu with default value of 'None', True if --gpu is specified in the command line
+      1. Input - String path to the image file - Required Value
+      2. Checpoint - String path to the pre-trained model checkpoint file with default value of 'checkpoint.pth'
+      3. Top_k as --top_k int number to indicate top number of class predictions for the image file with default value of 5
+      4. Category Names as --category_names String path to the category names json file.
+      5. Device --gpu with default value of 'cpu'
     This function returns these arguments as an ArgumentParser object.
     Parameters:
      None - simply using argparse module to create & store command line arguments
@@ -83,10 +82,11 @@ def get_prediction_input_args():
     """
   
     parser = argparse.ArgumentParser(description= "Process the command line arguments provide by the user")
-    parser.add_argument("input", type=str, help="Path to the folder of flower images" )
-    parser.add_argument("checkpoint", type=str, help="Type of CNN model architecture to use")
+    parser.add_argument("input", type=str, help="Path to the image file" )
+    parser.add_argument("checkpoint", type=str, default="checkpoint.pth", help="Path to the model checkkpoint file to load")
     parser.add_argument("--top_k", type=int, default= 5, help="The learning rate of the CNN training")
     parser.add_argument("--category_names", type=str, help="Number of units in the hidden layer of the classifier")
+    parser.add_argument("--arch", type=str, choices=["vgg16", "densenet121"], default="densenet121", help="Type of CNN model architecture to use")
     parser.add_argument("--gpu", action='store_true', help="Select to run the programme with GPU")
 
     return parser.parse_args()
