@@ -73,10 +73,11 @@ def get_prediction_input_args():
     
     Command Line Arguments:
       1. Input - String path to the image file - Required Value
-      2. Checpoint - String path to the pre-trained model checkpoint file with default value of 'checkpoint.pth'
+      2. Checkpoint - String path to the pre-trained model checkpoint file with default value of 'checkpoint.pth'
       3. Top_k as --top_k int number to indicate top number of class predictions for the image file with default value of 5
       4. Category Names as --category_names String path to the category names json file.
       5. Device --gpu with default value of 'cpu'
+      6. 
     This function returns these arguments as an ArgumentParser object.
     Parameters:
      None - simply using argparse module to create & store command line arguments
@@ -89,7 +90,6 @@ def get_prediction_input_args():
     parser.add_argument("checkpoint", type=str, default="checkpoint.tph", help="Path to the model checkkpoint file to load")
     parser.add_argument("--top_k", type=int, default= 5, help="The learning rate of the CNN training")
     parser.add_argument("--category_names", type=str, default='cat_to_name.json', help="Number of units in the hidden layer of the classifier")
-    parser.add_argument("--arch", type=str, choices=["vgg16", "densenet121"], help="Type of CNN model architecture to use")
     parser.add_argument("--gpu", action='store_true', help="Select to run the programme with GPU")
 
     return parser.parse_args()

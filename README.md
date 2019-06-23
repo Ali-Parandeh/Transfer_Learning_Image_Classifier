@@ -3,7 +3,7 @@
 A command line application that:
 
 - Lets users define their own classifier and hyperparameters, attach it to a Convolutional Neural Network, train it and save it to a checkpoint on any user-defined directory. 
-- The users can also load other trained models (checpoints) to classify images of from large number of classes and see top K classes & predictions. 
+- The users can also load other trained models (checkpoints) to classify images of from large number of classes and see top K classes & predictions. 
 - Both training and prediction functions can be done on both the CPU or GPU as specified by the user.
 - I have also provided a pre-trained CNN that can classify images of flowers up to 102 categories up to 93.5% accuracy.
 

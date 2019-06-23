@@ -17,15 +17,18 @@ from classifier import Classifier
 def checkpoint_loader(filepath):
     ''' Constructs the fully trained model from a saved checkpoint.
     '''
-    checkpoint = torch.load(
-        filepath, map_location=lambda storage, loc: storage)
+    # Extra args in torch.load() prevents GPU driver errors if working in CPU mode
+    checkpoint = torch.load(filepath, map_location=lambda storage, loc: storage)
 
+    # In default mode current checkpoint file is loaded by re-constructing the classifier
     if filepath == "checkpoint.tph":
         model = models.densenet121(pretrained=True)
         model.classifier = Classifier(checkpoint['input_size'],
                                       checkpoint['output_size'],
                                       checkpoint['hidden_layer'],
                                       checkpoint['dropout'])
+
+    # Any other checkpoint files saved by this command line application can be easily loaded using this code
     else:
         model = checkpoint["model"]
 
@@ -123,18 +126,15 @@ def predict(image_path, model, gpu, json_path, topk=5):
 
 
 def main():
+    # Get user inputs for the loading the model checkpoint and prediction function
     pi = get_prediction_input_args()
-
     model = checkpoint_loader(pi.checkpoint)
-    prediction, probs = predict(
-        pi.input, model, pi.gpu, pi.category_names, pi.top_k)
+    prediction, probs = predict(pi.input, model, pi.gpu, pi.category_names, pi.top_k)
 
-    print("The most likely class is {} with associated probability {}.".format(
-        prediction[0], probs[0]))
+    print("The most likely class is {} with associated probability {}.".format(prediction[0], probs[0]))
     print("The other top {} classes include the following: ".format(pi.top_k - 1))
     for i in range(len(prediction)-1):
-        print("Class Name: {}    Probability: {}". format(
-            prediction[i+1], probs[i+1]))
+        print("Class Name: {}    Probability: {}". format(prediction[i+1], probs[i+1]))
 
 
 if __name__ == "__main__":

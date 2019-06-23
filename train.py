@@ -32,12 +32,9 @@ def data_loader(data_dir):
 
     # Loading the datasets with ImageFolder
     data = {}
-    data["train_data"] = datasets.ImageFolder(
-        train_dir, transform=train_transforms)
-    data["test_data"] = datasets.ImageFolder(
-        test_dir, transform=test_valid_transforms)
-    data["valid_data"] = datasets.ImageFolder(
-        valid_dir, transform=test_valid_transforms)
+    data["train_data"] = datasets.ImageFolder(train_dir, transform=train_transforms)
+    data["test_data"] = datasets.ImageFolder(test_dir, transform=test_valid_transforms)
+    data["valid_data"] = datasets.ImageFolder(valid_dir, transform=test_valid_transforms)
 
     # Using the image datasets and the trainforms, define the dataloaders
     data_iterator = {}
@@ -71,8 +68,6 @@ def train(model, device, train_iterator, valid_iterator, criterion, optimizer, e
         validation_accuracies: A list of average accuracies in percentage of the batch per epoch
 
     '''
-    training_losses, validation_losses, validation_accuracies = [], [], []
-
     for e in range(epochs):
         training_loss = 0
         validation_loss = 0
@@ -92,12 +87,7 @@ def train(model, device, train_iterator, valid_iterator, criterion, optimizer, e
         else:
 
             with torch.no_grad():
-                validation_loss, validation_accuracy = validation(
-                    model, valid_iterator, criterion, device)
-                training_losses.append(training_loss/len(train_iterator))
-                validation_losses.append(validation_loss/len(valid_iterator))
-                validation_accuracies.append(
-                    validation_accuracy/len(valid_iterator))
+                validation_loss, validation_accuracy = validation(model, valid_iterator, criterion, device)
 
                 print(f"Device = {device}", "Epoch {}/{}.. ".format(e+1, epochs),
                       "Training Loss: {:.3f}.. ".format(
@@ -143,7 +133,7 @@ def validation(model, data_iterator, criterion, device):
 
 
 # Save the checkpoint
-def save_model(model, data, checkpoint_name, optimizer):
+def save_model(model, data, checkpoint_dir, optimizer):
     ''' Saves the model checkpoint into a tph file
     '''
     model.class_to_idx = data.class_to_idx
@@ -153,26 +143,26 @@ def save_model(model, data, checkpoint_name, optimizer):
                   "state_dict": model.state_dict(),
                   "optimiser_state_dict": optimizer.state_dict()}
 
-    torch.save(checkpoint, checkpoint_name)
+    torch.save(checkpoint, checkpoint_dir)
 
     print("Model Saved!")
 
 
 def main():
-
+    # Get user inputs for constructing and training a model.
     ti = get_training_input_args()
-
     data, data_iterator = data_loader(ti.dir)
 
     if ti.arch == "vgg16":
         model = models.vgg16(pretrained=True)
         input_features = model.classifier[0].in_features
-        checkpoint_name = ti.save_dir + "vgg16_checkpoint.pth"
+        checkpoint_dir = ti.save_dir + "vgg16_checkpoint.pth"
     else:
         model = models.densenet121(pretrained=True)
         input_features = model.classifier.in_features
-        checkpoint_name = ti.save_dir + "densenet121_checkpoint.pth"
+        checkpoint_dir = ti.save_dir + "densenet121_checkpoint.pth"
 
+    # Freeze all parameters. When the classifier later on is replaced with our own, only our classifier parameters will be updated during training.
     for param in model.parameters():
         param.requires_grad = False
 
@@ -190,8 +180,7 @@ def main():
         hyperparams.optimizer,
         hyperparams.epochs)
 
-    save_model(model, data["train_data"],
-               checkpoint_name, hyperparams.optimizer)
+    save_model(model, data["train_data"], checkpoint_dir, hyperparams.optimizer)
 
 
 if __name__ == "__main__":
