@@ -118,11 +118,11 @@ def predict(image_path, model, gpu, json_path, topk=5):
 
     # Translate the image class indices to class names and save in a dictionary
     cat_to_name = load_labels(json_path)
-    top_five_classes = []
+    top_k_classes = []
     for i in range(len(classes)):
-        top_five_classes.append(cat_to_name[classes[i]])
+        top_k_classes.append(cat_to_name[classes[i]])
 
-    return top_five_classes, probs
+    return top_k_classes, probs
 
 
 def main():
