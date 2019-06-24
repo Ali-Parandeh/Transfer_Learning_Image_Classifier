@@ -62,7 +62,10 @@ To train a new network on a data set with `train.py`:
 _Extra Options:_
 
 - Set directory to save checkpoints: `python train.py data_dir --save_dir save_directory`
-- Choose architecture: `python train.py data_dir --arch "vgg13"`
+- Choose architecture: `python train.py data_dir --arch "vgg13"` 
+
+> **NOTE: Only `densenet121` and `vgg16` pre-trained CNNs are currently supported in this application.**
+
 - Set hyperparameters: `python train.py data_dir --learning_rate 0.01 --hidden_units 512 --epochs 20`
 - Use GPU for training: `python train.py data_dir --gpu`
 - Predict image name from an image with `predict.py` along with the probability of that name. That is, the user can pass in a single image `/path/to/image` and return the image name and class probability.
