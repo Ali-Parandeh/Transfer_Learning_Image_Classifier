@@ -15,6 +15,9 @@ In this project I first built this image classifier with PyTorch in Jupyter Note
 
 For more information about this project and Udacity Nanodegree check this link: [Udacity AI Programming with Python Nanodegree](https://eu.udacity.com/course/ai-programming-python-nanodegree--nd089)
 
+<img src="https://github.com/Ali-Parandeh/Transfer_Learning_Image_Classifier/blob/master/assets/inference_example.png" style="width: 10px">
+
+
 ## Installation
 
 First clone this repository using:
@@ -45,6 +48,7 @@ flowers/valid/1/asd932_.png
 ```
 
 For more information, see Pytorch's tutorial on how to load data: [Pytorch's Data Loading and Processing Tutorial](https://pytorch.org/tutorials/beginner/data_loading_tutorial.html)
+
 
 ## Usage
 
@@ -77,3 +81,5 @@ _Extra Options:_
 - Return top KK most likely classes: `python predict.py input checkpoint --top_k 3`
 - Use a mapping of categories to real names: `python predict.py input checkpoint --category_names cat_to_name.json`
 - Use GPU for inference: `python predict.py input checkpoint --gpu`
+
+
